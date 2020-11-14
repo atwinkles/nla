@@ -7,7 +7,8 @@ int main() {
     Matrix<double> m(2,2,twos); 
     Matrix<double> n(2,2,twos); 
     Matrix<double> k = m*n;
-    Matrix<double> l = 2 * k;
+    k.print();
+    Matrix<double> l = 2*k;
     l.print();
     return 0;
 }

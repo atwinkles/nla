@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <iostream>
 
-template<typename T>
+template<class T>
 Matrix<T>::Matrix(unsigned rows, unsigned cols)
 {
     rows_ = rows;
@@ -12,7 +12,7 @@ Matrix<T>::Matrix(unsigned rows, unsigned cols)
     data_ = new T[rows*cols];
 }
 
-template<typename T>
+template<class T>
 Matrix<T>::Matrix(unsigned rows, unsigned cols, T mat[])
 {
     rows_ = rows;
@@ -25,25 +25,25 @@ Matrix<T>::Matrix(unsigned rows, unsigned cols, T mat[])
     }
 }
 
-template<typename T>
+template<class T>
 unsigned Matrix<T>::row_size() const
 {
     return rows_;
 }
 
-template<typename T>
+template<class T>
 unsigned Matrix<T>::col_size() const
 {
     return cols_;
 }
 
-template<typename T>
+template<class T>
 Matrix<T>::~Matrix()
 {
     delete[] data_;
 }
 
-template<typename T>
+template<class T>
 void Matrix<T>::print()
 {
     for (unsigned i = 0; i < rows_; i++)
@@ -58,7 +58,7 @@ void Matrix<T>::print()
     std::cout << std::endl;
 }
 
-template<typename T>
+template<class T>
 Matrix<T> Matrix<T>::operator+(const Matrix<T>& n)
 {
     unsigned row = rows_;
@@ -76,7 +76,7 @@ Matrix<T> Matrix<T>::operator+(const Matrix<T>& n)
     return result;
 }
 
-template<typename T>
+template<class T>
 Matrix<T> Matrix<T>::operator*(const Matrix<T>& n)
 {
     unsigned row = rows_;
@@ -88,28 +88,34 @@ Matrix<T> Matrix<T>::operator*(const Matrix<T>& n)
     {
         for (unsigned j = 0; j < col; j++)
         {
-            T sumval = 0;
+            result(i,j) = 0;
             for (unsigned k = 0; k < col; k++) {
-                sumval += (*this)(i,k) * n(k,j);
+                result(i,j) += (*this)(i,k) * n(k,j);
             }
-            result(i,j) = sumval;
         }
     }
     return result;
 }
 
-template<typename T>
-Matrix<T> Matrix<T>::operator*(const T& n)
+/*template<class T>
+Matrix<T> Matrix<T>::operator*(Matrix<T> m, const Matrix<T> k)
+{
+    m *= k;
+    return m;
+}*/
+
+template<class T>
+Matrix<T> Matrix<T>::operator*(const T& k)
 {
     T data[rows_*cols_];
     for (unsigned i = 0; i < rows_*cols_; i++) {
-        data[i] = n * data_[i];
+        data[i] = k * data_[i];
     }
     Matrix<T> result(rows_,cols_,data);
     return result;
 }
 
-template<typename T>
+template<class T>
 T& Matrix<T>::operator() (unsigned row, unsigned col)
 {
     if (row >= rows_ || col >= cols_)
@@ -117,7 +123,7 @@ T& Matrix<T>::operator() (unsigned row, unsigned col)
     return data_[cols_*row + col];
 }
 
-template<typename T>
+template<class T>
 T Matrix<T>::operator() (unsigned row, unsigned col) const
 {
     if (row >= rows_ || col >= cols_)
