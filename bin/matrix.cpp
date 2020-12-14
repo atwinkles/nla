@@ -1,50 +1,37 @@
-#include "Matrix.h"
 #include <stdexcept>
 #include <iostream>
+#include "matrix.h"
 
-template<class T>
-Matrix<T>::Matrix(unsigned rows, unsigned cols)
+/* PUBLIC MEMBER FUNCTIONS */
+
+Matrix::Matrix(unsigned rows, unsigned cols)   // Constructor
 {
     rows_ = rows;
     cols_ = cols;
     if (rows == 0 || cols == 0)
         throw std::out_of_range("Matrix constructor has 0 size");
-    data_ = new T[rows*cols];
+    data_ = new double[rows*cols];
 }
-
-template<class T>
-Matrix<T>::Matrix(unsigned rows, unsigned cols, T mat[])
+Matrix::Matrix(unsigned rows, unsigned cols, double mat[]) // Constructor
 {
     rows_ = rows;
     cols_ = cols;
     if (rows == 0 || cols == 0)
         throw std::out_of_range("Matrix constructor has 0 size");
-    data_ = new T[rows*cols];
+    data_ = new double[rows*cols];
     for (int i = 0; i < rows*cols; i++) {
         data_[i] = mat[i];
     }
 }
-
-template<class T>
-unsigned Matrix<T>::row_size() const
+unsigned Matrix::row_size() const
 {
     return rows_;
 }
-
-template<class T>
-unsigned Matrix<T>::col_size() const
+unsigned Matrix::col_size() const
 {
     return cols_;
 }
-
-template<class T>
-Matrix<T>::~Matrix()
-{
-    delete[] data_;
-}
-
-template<class T>
-void Matrix<T>::print()
+void Matrix::print()
 {
     for (unsigned i = 0; i < rows_; i++)
     {
@@ -57,81 +44,83 @@ void Matrix<T>::print()
     }
     std::cout << std::endl;
 }
-
-template<class T>
-Matrix<T> Matrix<T>::operator+(const Matrix<T>& n)
-{
-    unsigned row = rows_;
-    unsigned col = cols_;
-    if (row != n.row_size() || col != n.col_size())
-        throw std::out_of_range("Matrices are not the same size");
-    Matrix<T> result(row,col);
-    for (unsigned i = 0; i < row; i++)
-    {
-        for (unsigned j = 0; j < col; j++)
-        {
-            result(i,j) = (*this)(i,j) + n(i,j);
-        }
-    }
-    return result;
-}
-
-template<class T>
-Matrix<T> Matrix<T>::operator*(const Matrix<T>& n)
-{
-    unsigned row = rows_;
-    unsigned col = cols_;
-    if (col != n.row_size())
-        throw std::out_of_range("Matrices are not the same size");
-    Matrix<T> result(row,n.col_size());
-    for (unsigned i = 0; i < row; i++)
-    {
-        for (unsigned j = 0; j < col; j++)
-        {
-            result(i,j) = 0;
-            for (unsigned k = 0; k < col; k++) {
-                result(i,j) += (*this)(i,k) * n(k,j);
-            }
-        }
-    }
-    return result;
-}
-
-/*template<class T>
-Matrix<T> Matrix<T>::operator*(Matrix<T> m, const Matrix<T> k)
-{
-    m *= k;
-    return m;
-}*/
-
-template<class T>
-Matrix<T> Matrix<T>::operator*(const T& k)
-{
-    T data[rows_*cols_];
-    for (unsigned i = 0; i < rows_*cols_; i++) {
-        data[i] = k * data_[i];
-    }
-    Matrix<T> result(rows_,cols_,data);
-    return result;
-}
-
-template<class T>
-T& Matrix<T>::operator() (unsigned row, unsigned col)
+double& Matrix::operator() (unsigned row, unsigned col) // Assigns value at (row,col)
 {
     if (row >= rows_ || col >= cols_)
         throw std::out_of_range("Matrix subscript out of bounds");
     return data_[cols_*row + col];
 }
-
-template<class T>
-T Matrix<T>::operator() (unsigned row, unsigned col) const
+double Matrix::operator() (unsigned row, unsigned col) const // Returns value at (row,col)
 {
     if (row >= rows_ || col >= cols_)
         throw std::out_of_range("const Matrix substript out of bounds");
     return data_[cols_*row + col];
 }
+Matrix::~Matrix()   // Destructor
+{
+    delete[] data_;
+}
+Matrix::Matrix(const Matrix& m) : rows_(m.row_size()), cols_(m.col_size())             // Copy constructor
+{
+    for (unsigned i = 0; i< rows_; i++) {
+        for (unsigned j = 0; j < cols_; j++) {
+            data_[cols_*i + j] = m(i,j);
+        }
+    }
+}
 
-/* Explicit instantiating several data types */
-template class Matrix<double>;
-template class Matrix<int>;
-template class Matrix<float>;
+Matrix& Matrix::operator= (const Matrix& m)    // Assignment operator
+{
+    if (this == &m) {
+        return *this;
+    }
+    
+    if (rows_ != m.row_size() || cols_ != m.col_size()){
+        delete[] data_;
+        rows_ = m.row_size();
+        cols_ = m.col_size();
+        data_ = new double[rows_*cols_];
+        for (unsigned i = 0; i < rows_; i++) {
+            for (unsigned j = 0; j < cols_; j++)
+            data_[cols_*i + j] = m(i,j);
+        }
+    }
+    return *this;
+}
+
+Matrix& Matrix::operator+=(const Matrix& rhs)
+{
+    if (cols_ != rhs.col_size() || rows_ != rhs.row_size())
+        throw std::out_of_range("Matrices are not the same size");
+    Matrix temp(rows_,cols_);
+    for (unsigned i = 0; i < rows_; i++) {
+        for (unsigned j = 0; j < cols_; j++) {
+            temp(i,j) = data_[cols_*i + j] + rhs(i,j);
+        }
+    }
+    return (*this = temp);
+}
+
+Matrix& Matrix::operator*=(const Matrix& rhs)
+{
+    if (cols_ != rhs.row_size())
+        throw std::out_of_range("Matrices are not the same size");
+    Matrix temp(rows_,rhs.col_size());
+    for (unsigned i = 0; i < temp.row_size(); i++)
+    {
+        for (unsigned j = 0; j < temp.col_size(); j++)
+        {
+            for (unsigned k = 0; k < cols_; k++) { 
+                temp(i,j) += data_[cols_*i + k] * rhs(k,j);
+            }
+        }
+    }
+    return (*this = temp);
+}
+Matrix& Matrix::operator*=(const double& rhs)
+{
+    for (unsigned i = 0; i < rows_*cols_; i++) {
+        data_[i] *= rhs;
+    }
+    return *this;
+}

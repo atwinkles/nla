@@ -9,6 +9,7 @@ class Matrix {
         unsigned row_size() const;
         unsigned col_size() const;
         void print();
+        Matrix<T>& operator*=(const Matrix<T>& rhs);
 
         Matrix<T> operator+(const Matrix<T>& n);
         /*Matrix<T>& operator*=(const Matrix<T>& k){
@@ -17,8 +18,8 @@ class Matrix {
             }
             return *this;
         };*/
-        Matrix<T> operator*(const Matrix<T>& n);
-        Matrix<T> operator*(const T& k);
+        /*Matrix<T> operator*(const Matrix<T>& n); */
+
         T& operator() (unsigned row, unsigned col); // Assigns value at (row,col)
         T operator() (unsigned row, unsigned col) const; // Returns value at (row,col)
 
@@ -30,6 +31,5 @@ class Matrix {
         unsigned rows_, cols_;
         T* data_;
 };
-Matrix<T> operator*(const T& k, const Matrix<T>& m) {return m*k};
 
 #endif
