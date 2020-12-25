@@ -62,6 +62,7 @@ Matrix::~Matrix()   // Destructor
 }
 Matrix::Matrix(const Matrix& m) : rows_(m.row_size()), cols_(m.col_size())             // Copy constructor
 {
+    data_ = new double[rows_*cols_];
     for (unsigned i = 0; i< rows_; i++) {
         for (unsigned j = 0; j < cols_; j++) {
             data_[cols_*i + j] = m(i,j);
@@ -81,8 +82,9 @@ Matrix& Matrix::operator= (const Matrix& m)    // Assignment operator
         cols_ = m.col_size();
         data_ = new double[rows_*cols_];
         for (unsigned i = 0; i < rows_; i++) {
-            for (unsigned j = 0; j < cols_; j++)
-            data_[cols_*i + j] = m(i,j);
+            for (unsigned j = 0; j < cols_; j++) {
+                data_[cols_*i + j] = m(i,j);
+            }
         }
     }
     return *this;
@@ -92,13 +94,24 @@ Matrix& Matrix::operator+=(const Matrix& rhs)
 {
     if (cols_ != rhs.col_size() || rows_ != rhs.row_size())
         throw std::out_of_range("Matrices are not the same size");
-    Matrix temp(rows_,cols_);
     for (unsigned i = 0; i < rows_; i++) {
         for (unsigned j = 0; j < cols_; j++) {
-            temp(i,j) = data_[cols_*i + j] + rhs(i,j);
+            data_[cols_*i + j] += rhs(i,j);
         }
     }
-    return (*this = temp);
+    return *this;
+}
+
+Matrix& Matrix::operator-=(const Matrix& rhs)
+{
+    if (cols_ != rhs.col_size() || rows_ != rhs.row_size())
+        throw std::out_of_range("Matrices are not the same size");
+    for (unsigned i = 0; i < rows_; i++) {
+        for (unsigned j = 0; j < cols_; j++) {
+            data_[cols_*i + j] -= rhs(i,j);
+        }
+    }
+    return *this;
 }
 
 Matrix& Matrix::operator*=(const Matrix& rhs)
@@ -123,4 +136,30 @@ Matrix& Matrix::operator*=(const double& rhs)
         data_[i] *= rhs;
     }
     return *this;
+}
+
+/* NON-MEMBER FUNCTIONS */
+
+Matrix operator+(const Matrix& m1, const Matrix& m2)
+{
+    Matrix temp(m1);
+    return (temp += m2);
+}
+
+Matrix operator*(const Matrix& m1, const Matrix& m2)
+{
+    Matrix temp(m1);
+    return (temp *= m2);
+}
+
+Matrix operator*(double num, const Matrix& m1)
+{
+    Matrix temp(m1);
+    return (m1 * num);
+}
+
+Matrix operator*(const Matrix& m1, double num)
+{
+    Matrix temp(m1);
+    return (temp *= num);
 }

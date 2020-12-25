@@ -3,23 +3,29 @@
 
 class Matrix {
     public:
-        Matrix(unsigned rows, unsigned cols);
-        Matrix(unsigned rows, unsigned cols, double mat[]);
+        Matrix(unsigned, unsigned);
+        Matrix(unsigned, unsigned, double []);
         unsigned row_size() const;
         unsigned col_size() const;
         void print();
-        double& operator() (unsigned row, unsigned col);
-        double operator() (unsigned row, unsigned col) const;
+        double& operator() (unsigned, unsigned);
+        double operator() (unsigned, unsigned) const;
         ~Matrix();
-        Matrix(const Matrix& m);
+        Matrix(const Matrix&);
 
-        Matrix& operator=(const Matrix& m);
-        Matrix& operator+=(const Matrix& rhs);
-        Matrix& operator*=(const Matrix& rhs);
-        Matrix& operator*=(const double& rhs);
+        Matrix& operator=(const Matrix&);
+        Matrix& operator+=(const Matrix&);
+        Matrix& operator-=(const Matrix&);
+        Matrix& operator*=(const Matrix&);
+        Matrix& operator*=(const double&);
     private:
         unsigned rows_,cols_;
         double* data_;
 };
+
+Matrix operator+(const Matrix&, const Matrix&);
+Matrix operator*(const Matrix&, const Matrix&);
+Matrix operator*(double, const Matrix&);
+Matrix operator*(const Matrix&, double);
 
 #endif
