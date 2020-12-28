@@ -1,5 +1,5 @@
 #ifndef MATRIX_H
-#define MATARIX_H
+#define MATRIX_H
 
 class Matrix {
     public:
@@ -12,12 +12,15 @@ class Matrix {
         double operator() (unsigned, unsigned) const;
         ~Matrix();
         Matrix(const Matrix&);
+	static Matrix identity(unsigned);
 
         Matrix& operator=(const Matrix&);
         Matrix& operator+=(const Matrix&);
         Matrix& operator-=(const Matrix&);
         Matrix& operator*=(const Matrix&);
         Matrix& operator*=(const double&);
+	static double dot(const Matrix&, const Matrix&);
+	static Matrix outer(const Matrix&, const Matrix&);
     private:
         unsigned rows_,cols_;
         double* data_;
